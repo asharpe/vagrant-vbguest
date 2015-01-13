@@ -76,9 +76,13 @@ module VagrantVbguest
         driver_version = super
 
         communicate.sudo('VBoxService --version', :error_check => false) do |type, data|
-          if (v = data.to_s.match(/^(\d+\.\d+.\d+)/)) && driver_version != v[1]
-            @env.ui.warn(I18n.t("vagrant_vbguest.guest_version_reports_differ", :driver => driver_version, :service => v[1]))
+          if (v = data.to_s.match(/^(\d+\.\d+.\d+)/))
             @guest_version = v[1]
+            if driver_version != v[1]
+              @env.ui.warn(I18n.t("vagrant_vbguest.guest_version_reports_differ", :driver => driver_version, :service => v[1]))
+            end
+          else
+            @guest_version = 'not installed'
           end
         end
         @guest_version
